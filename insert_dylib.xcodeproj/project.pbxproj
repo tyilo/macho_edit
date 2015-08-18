@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		556AE7AC1B83C6D400414E32 /* cpuinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 556AE7AA1B83C6D400414E32 /* cpuinfo.cpp */; };
+		556AE7AF1B83E5C900414E32 /* menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 556AE7AD1B83E5C900414E32 /* menu.cpp */; };
 		55708CC21B308025002D62A8 /* insert_dylib_tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 55708CC11B308025002D62A8 /* insert_dylib_tests.m */; };
 		55708CCD1B308B77002D62A8 /* test.c.foo in Resources */ = {isa = PBXBuildFile; fileRef = 55708CCC1B308B77002D62A8 /* test.c.foo */; };
-		55ABCB4D19881CA600B03F31 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 55ABCB4C19881CA600B03F31 /* main.c */; };
+		55ABCB4D19881CA600B03F31 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55ABCB4C19881CA600B03F31 /* main.cpp */; };
 		55EB1FC21B83AD7E009F1AD1 /* macho.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55EB1FC01B83AD7E009F1AD1 /* macho.cpp */; };
-		55F6925F1B7C2EAC007413F7 /* fileutils.c in Sources */ = {isa = PBXBuildFile; fileRef = 55F6925D1B7C2EAC007413F7 /* fileutils.c */; };
+		55F6925F1B7C2EAC007413F7 /* fileutils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55F6925D1B7C2EAC007413F7 /* fileutils.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,16 +29,20 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		556AE7AA1B83C6D400414E32 /* cpuinfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cpuinfo.cpp; sourceTree = "<group>"; };
+		556AE7AB1B83C6D400414E32 /* cpuinfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpuinfo.h; sourceTree = "<group>"; };
+		556AE7AD1B83E5C900414E32 /* menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = menu.cpp; sourceTree = "<group>"; };
+		556AE7AE1B83E5C900414E32 /* menu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = menu.h; sourceTree = "<group>"; };
 		55708CBD1B308025002D62A8 /* insert_dylib_tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = insert_dylib_tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		55708CC01B308025002D62A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		55708CC11B308025002D62A8 /* insert_dylib_tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = insert_dylib_tests.m; sourceTree = "<group>"; };
 		55708CCC1B308B77002D62A8 /* test.c.foo */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.c.foo; sourceTree = "<group>"; };
 		55ABCB4919881CA600B03F31 /* insert_dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = insert_dylib; sourceTree = BUILT_PRODUCTS_DIR; };
-		55ABCB4C19881CA600B03F31 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		55ABCB4C19881CA600B03F31 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		55EB1FC01B83AD7E009F1AD1 /* macho.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = macho.cpp; sourceTree = "<group>"; };
 		55EB1FC11B83AD7E009F1AD1 /* macho.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = macho.h; sourceTree = "<group>"; };
 		55F6925C1B7C2E86007413F7 /* macros.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = macros.h; sourceTree = "<group>"; };
-		55F6925D1B7C2EAC007413F7 /* fileutils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fileutils.c; sourceTree = "<group>"; };
+		55F6925D1B7C2EAC007413F7 /* fileutils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fileutils.cpp; sourceTree = "<group>"; };
 		55F6925E1B7C2EAC007413F7 /* fileutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fileutils.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -99,10 +105,14 @@
 			children = (
 				55F6925C1B7C2E86007413F7 /* macros.h */,
 				55F6925E1B7C2EAC007413F7 /* fileutils.h */,
-				55F6925D1B7C2EAC007413F7 /* fileutils.c */,
-				55ABCB4C19881CA600B03F31 /* main.c */,
+				55F6925D1B7C2EAC007413F7 /* fileutils.cpp */,
+				556AE7AB1B83C6D400414E32 /* cpuinfo.h */,
+				556AE7AA1B83C6D400414E32 /* cpuinfo.cpp */,
 				55EB1FC11B83AD7E009F1AD1 /* macho.h */,
 				55EB1FC01B83AD7E009F1AD1 /* macho.cpp */,
+				556AE7AE1B83E5C900414E32 /* menu.h */,
+				556AE7AD1B83E5C900414E32 /* menu.cpp */,
+				55ABCB4C19881CA600B03F31 /* main.cpp */,
 			);
 			path = insert_dylib;
 			sourceTree = "<group>";
@@ -201,8 +211,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				55EB1FC21B83AD7E009F1AD1 /* macho.cpp in Sources */,
-				55ABCB4D19881CA600B03F31 /* main.c in Sources */,
-				55F6925F1B7C2EAC007413F7 /* fileutils.c in Sources */,
+				55ABCB4D19881CA600B03F31 /* main.cpp in Sources */,
+				556AE7AC1B83C6D400414E32 /* cpuinfo.cpp in Sources */,
+				556AE7AF1B83E5C900414E32 /* menu.cpp in Sources */,
+				55F6925F1B7C2EAC007413F7 /* fileutils.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

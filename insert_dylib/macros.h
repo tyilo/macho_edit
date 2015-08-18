@@ -18,4 +18,8 @@
 
 #define ABSDIFF(x, y) ((x) > (y)? (uintmax_t)(x) - (uintmax_t)(y): (uintmax_t)(y) - (uintmax_t)(x))
 
+#define READ(x, f)  fread(&x, sizeof(x), 1, f)
+#define WRITE(x, f) fwrite(&x, sizeof(x), 1, f)
+#define PEEK(x, f)  fpeek(&x, sizeof(x), 1, f)
+
 #endif
