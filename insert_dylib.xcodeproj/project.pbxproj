@@ -101,8 +101,8 @@
 				55F6925E1B7C2EAC007413F7 /* fileutils.h */,
 				55F6925D1B7C2EAC007413F7 /* fileutils.c */,
 				55ABCB4C19881CA600B03F31 /* main.c */,
-				55EB1FC01B83AD7E009F1AD1 /* macho.cpp */,
 				55EB1FC11B83AD7E009F1AD1 /* macho.h */,
+				55EB1FC01B83AD7E009F1AD1 /* macho.cpp */,
 			);
 			path = insert_dylib;
 			sourceTree = "<group>";
