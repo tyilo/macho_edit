@@ -10,6 +10,8 @@
 		55708CC21B308025002D62A8 /* insert_dylib_tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 55708CC11B308025002D62A8 /* insert_dylib_tests.m */; };
 		55708CCD1B308B77002D62A8 /* test.c.foo in Resources */ = {isa = PBXBuildFile; fileRef = 55708CCC1B308B77002D62A8 /* test.c.foo */; };
 		55ABCB4D19881CA600B03F31 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 55ABCB4C19881CA600B03F31 /* main.c */; };
+		55EB1FC21B83AD7E009F1AD1 /* macho.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55EB1FC01B83AD7E009F1AD1 /* macho.cpp */; };
+		55F6925F1B7C2EAC007413F7 /* fileutils.c in Sources */ = {isa = PBXBuildFile; fileRef = 55F6925D1B7C2EAC007413F7 /* fileutils.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,6 +33,11 @@
 		55708CCC1B308B77002D62A8 /* test.c.foo */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.c.foo; sourceTree = "<group>"; };
 		55ABCB4919881CA600B03F31 /* insert_dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = insert_dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		55ABCB4C19881CA600B03F31 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		55EB1FC01B83AD7E009F1AD1 /* macho.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = macho.cpp; sourceTree = "<group>"; };
+		55EB1FC11B83AD7E009F1AD1 /* macho.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = macho.h; sourceTree = "<group>"; };
+		55F6925C1B7C2E86007413F7 /* macros.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = macros.h; sourceTree = "<group>"; };
+		55F6925D1B7C2EAC007413F7 /* fileutils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fileutils.c; sourceTree = "<group>"; };
+		55F6925E1B7C2EAC007413F7 /* fileutils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fileutils.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,7 +97,12 @@
 		55ABCB4B19881CA600B03F31 /* insert_dylib */ = {
 			isa = PBXGroup;
 			children = (
+				55F6925C1B7C2E86007413F7 /* macros.h */,
+				55F6925E1B7C2EAC007413F7 /* fileutils.h */,
+				55F6925D1B7C2EAC007413F7 /* fileutils.c */,
 				55ABCB4C19881CA600B03F31 /* main.c */,
+				55EB1FC01B83AD7E009F1AD1 /* macho.cpp */,
+				55EB1FC11B83AD7E009F1AD1 /* macho.h */,
 			);
 			path = insert_dylib;
 			sourceTree = "<group>";
@@ -188,7 +200,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				55EB1FC21B83AD7E009F1AD1 /* macho.cpp in Sources */,
 				55ABCB4D19881CA600B03F31 /* main.c in Sources */,
+				55F6925F1B7C2EAC007413F7 /* fileutils.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -333,6 +347,7 @@
 				55708CC41B308025002D62A8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		55ABCB4419881CA600B03F31 /* Build configuration list for PBXProject "insert_dylib" */ = {
 			isa = XCConfigurationList;
