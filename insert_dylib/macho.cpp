@@ -249,7 +249,7 @@ void MachO::remove_arch(uint32_t arch_index) {
 		new_offset = sizeof(fat_header);
 	} else {
 		auto &prev = archs[arch_index - 1];
-		new_offset = prev.offset - prev.size;
+		new_offset = prev.offset + prev.size;
 	}
 
 	archs.erase(archs.begin() + arch_index);
@@ -291,9 +291,18 @@ void MachO::insert_arch(MachO &macho, uint32_t arch_index) {
 
 	swap_arch(&arch);
 
+	uint32_t offset = ROUND_UP(file_size, 1 << arch.align);
+
+	arch.offset = offset;
+
 	archs.push_back(arch);
 
-	uint32_t offset = ROUND_UP(file_size, 1 << arch.align);
+	struct mach_header mh = macho.mach_headers[arch_index];
+	macho.swap_mach_header(&mh);
+	swap_mach_header(&mh);
+
+	mach_headers.push_back(mh);
+
 	uint32_t new_size = file_size + offset;
 
 	ftruncate(fd, new_size);

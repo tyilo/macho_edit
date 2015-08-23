@@ -490,6 +490,8 @@ int main(int argc, const char *argv[]) {
 
 	MachO macho = MachO(binary_path);
 
+	macho.print_description();
+
 	while(main_menu(macho)) {
 	}
 

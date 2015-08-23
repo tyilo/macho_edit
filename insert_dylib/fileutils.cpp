@@ -61,6 +61,6 @@ void fcpy(FILE *fdst, off_t dst, FILE *fsrc, off_t src, size_t len) {
 
 size_t fpeek(void *ptr, size_t size, size_t nitems, FILE *stream) {
 	size_t result = fread(ptr, size, nitems, stream);
-	fseeko(stream, result * size, SEEK_SET);
+	fseeko(stream, -(result * size), SEEK_CUR);
 	return result;
 }

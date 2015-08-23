@@ -43,20 +43,26 @@ size_t select_option(const char *header, std::vector<std::string> options) {
 		std::cout << (i + 1) << " " << options[i] << "\n";
 	}
 
-	printf("Select an option: ");
+	std::cout << "\nSelect an option: ";
 
 	while(true) {
-		char *line = NULL;
-		size_t size;
-		getline(&line, &size, stdin);
+		size_t o;
 
-		size_t o = strtoull(line, NULL, 10);
+		std::cin >> o;
 
-		if(1 <= o && o <= options.size()) {
+		if(std::cin && 1 <= o && o <= options.size()) {
 			return o - 1;
 		}
 
-		printf("Please enter a valid option: ");
+		if(std::cin.eof()) {
+			std::cout << "<EOF>\n";
+			exit(0);
+		}
+
+		std::cin.clear();
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+		std::cout << "Please enter a valid option: ";
 	}
 }
 
@@ -176,9 +182,9 @@ void fat_config(MachO &macho) {
 				}
 
 				uint32_t insert_arch = 0;
-				if(macho.n_archs > 1) {
+				if(macho_in.n_archs > 1) {
 					// XXX: Support ALL
-					insert_arch = select_arch(macho, "Binary contains multiple archs.\nPlease choose which one to insert:", true);
+					insert_arch = select_arch(macho_in, "Binary contains multiple archs.\nPlease choose which one to insert:", true);
 					if(insert_arch == CANCEL) {
 						break;
 					}
