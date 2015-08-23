@@ -36,8 +36,32 @@ __attribute__((format(printf, 1, 2))) bool ask(const char *format, ...) {
 	}
 }
 
+template <typename T>
+bool readline(T &line) {
+	std::cin >> line;
+
+	std::ios_base::iostate state = std::cin.rdstate();
+
+	std::cin.clear();
+
+	// Consume newline
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+	if(state == std::ios_base::goodbit) {
+		return true;
+	}
+
+	if(state == std::ios_base::eofbit) {
+		std::cout << "<EOF>\n";
+		exit(0);
+	}
+
+	return false;
+}
+
 size_t select_option(const char *header, std::vector<std::string> options) {
 	puts(header);
+	puts("");
 
 	for(size_t i = 0; i < options.size(); i++) {
 		std::cout << (i + 1) << " " << options[i] << "\n";
@@ -48,19 +72,11 @@ size_t select_option(const char *header, std::vector<std::string> options) {
 	while(true) {
 		size_t o;
 
-		std::cin >> o;
-
-		if(std::cin && 1 <= o && o <= options.size()) {
-			return o - 1;
+		if(readline(o)) {
+			if(1 <= o && o <= options.size()) {
+				return o - 1;
+			}
 		}
-
-		if(std::cin.eof()) {
-			std::cout << "<EOF>\n";
-			exit(0);
-		}
-
-		std::cin.clear();
-		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
 		std::cout << "Please enter a valid option: ";
 	}
@@ -121,7 +137,7 @@ void fat_config(MachO &macho) {
 		switch(select_option("", fat_options)) {
 			case 0: {
 				if(macho.n_archs == 0) {
-					printf("Can't make binary thin with no archs.");
+					std::cout << "Can't make binary thin with no archs.\n";
 					break;
 				}
 
@@ -160,18 +176,19 @@ void fat_config(MachO &macho) {
 				break;
 			}
 			case 3: {
-				printf("Enter path to binary: ");
+				std::cout << "Enter path to binary: ";
 
-				char *line = NULL;
-				size_t size;
-				size_t linelen = getline(&line, &size, stdin);
+				std::string path;
 
-				line[linelen - 1] = '\0';
+				readline(path);
 
 				MachO macho_in;
 				try {
-					macho_in = MachO(line);
+					macho_in = MachO(path.c_str());
 				} catch(std::string err) {
+					std::cout << err << "\n";
+					break;
+				} catch(const char *err) {
 					std::cout << err << "\n";
 					break;
 				}
