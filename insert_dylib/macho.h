@@ -37,6 +37,11 @@ public:
 	std::string arch_description(struct fat_arch &arch);
 	void print_description();
 
+	struct load_command *read_load_command(uint32_t magic);
+	char *get_lc_str(uint32_t magic, struct load_command &lc, union lc_str lc_str);
+	std::string load_command_description(uint32_t magic, struct load_command &lc);
+	void print_load_commands(uint32_t arch_index);
+
 	struct fat_arch arch_from_mach_header(struct mach_header &mach_header, uint32_t size);
 
 	void make_fat();

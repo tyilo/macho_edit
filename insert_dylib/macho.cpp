@@ -2,6 +2,7 @@
 
 #include "macros.h"
 #include "fileutils.h"
+#include "magicnames.h"
 #include "cpuinfo.h"
 
 #include <assert.h>
@@ -11,6 +12,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <iomanip>
 
 MachO::MachO() {
 }
@@ -133,31 +135,126 @@ void MachO::print_description() {
 	}
 }
 
-#if 0
-void print_commands(FILE *f, size_t header_offset, int indent) {
-	fseeko(f, header_offset, SEEK_SET);
+struct load_command *MachO::read_load_command(uint32_t magic) {
+	struct load_command lc_header;
+	PEEK(lc_header, file);
 
-	struct mach_header mh;
-	fread(&mh, sizeof(struct mach_header), 1, f);
+	uint32_t size = SWAP32(lc_header.cmdsize, magic);
 
-	printf_indent(indent, "%s executable\n", cpu_name(SWAP32(mh.cputype, mh.magic), SWAP32(mh.cpusubtype, mh.magic)));
+	struct load_command *lc = (struct load_command *)malloc(size);
+	fread((void *)lc, size, 1, file);
+	return lc;
+}
 
-	if(IS_64_BIT(mh.magic)) {
-		fseeko(f, sizeof(struct mach_header_64) - sizeof(mh), SEEK_CUR);
+char *MachO::get_lc_str(uint32_t magic, struct load_command &lc, union lc_str lc_str) {
+	auto *ptr = (char *)&lc;
+	return &ptr[SWAP32(lc_str.offset, magic)];
+}
+
+std::string MachO::load_command_description(uint32_t magic, struct load_command &lc) {
+	uint32_t cmd = SWAP32(lc.cmd, magic);
+	std::string name = cmd_name(cmd);
+
+	std::ostringstream o;
+
+	o << name;
+
+	switch(cmd) {
+		case LC_SEGMENT: {
+			auto &c = (struct segment_command &)lc;
+
+			o << ": " << std::string(c.segname, ELEMENTS(c.segname));
+
+			break;
+		}
+		case LC_SEGMENT_64: {
+			auto &c = (struct segment_command_64 &)lc;
+
+			o << ": " << std::string(c.segname, ELEMENTS(c.segname));
+
+			break;
+		}
+		case LC_LOAD_DYLINKER: {
+			auto &c = (struct dylinker_command &)lc;
+
+			o << ": " << get_lc_str(magic, lc, c.name);
+
+			break;
+		}
+		case LC_UUID: {
+			auto &c = (struct uuid_command &)lc;
+
+			size_t form[] = {4, 2, 2, 2, 6};
+
+			o << ": " << std::hex << std::setfill('0') << std::setw(2);
+
+			size_t offset = 0;
+			for(size_t i = 0; i < ELEMENTS(form); i++) {
+				if(i != 0) {
+					o << "-";
+				}
+				for(size_t j = 0; j < form[i]; j++) {
+					o << (unsigned int)c.uuid[offset + j];
+				}
+				offset += i;
+			}
+
+			break;
+		}
+		case LC_VERSION_MIN_MACOSX:
+		case LC_VERSION_MIN_IPHONEOS: {
+			auto &c = (struct version_min_command &)lc;
+
+			size_t form[] = {2, 1, 1};
+
+			o << ": ";
+
+			size_t offset = 0;
+			for(size_t i = 0; i < ELEMENTS(form); i++) {
+				if(i != 0) {
+					o << ".";
+				}
+
+				uint16_t version = 0;
+				for(size_t j = 0; j < form[i]; j++) {
+					version *= form[i];
+					version += ((uint8_t *)&c.version)[offset + j];
+				}
+
+				o << version;
+
+				offset += i;
+			}
+		}
+		case LC_MAIN: {
+			auto &c = (struct entry_point_command &)lc;
+
+			o << ": ";
+
+			o << std::hex << "0x" << c.entryoff;
+		}
+		case LC_LOAD_DYLIB: {
+			auto &c = (struct dylib_command &)lc;
+
+			o << ": " << get_lc_str(magic, lc, c.dylib.name);
+		}
 	}
 
-	uint32_t ncmds = SWAP32(mh.ncmds, mh.magic);
-	for(uint32_t i = 0; i < ncmds; i++) {
-		struct load_command lc;
-		fread(&lc, sizeof(lc), 1, f);
+	return o.str();
+}
 
-		uint32_t cmd = SWAP32(lc.cmd, mh.magic);
-		printf_indent(indent + 1, "%s\n", cmd_name(cmd));
+void MachO::print_load_commands(uint32_t arch_index){
+	auto &mh = mach_headers[arch_index];
 
-		fseeko(f, SWAP32(lc.cmdsize, mh.magic) - sizeof(lc), SEEK_CUR);
+	fseeko(file, archs[arch_index].offset + MH_SIZE(mh.magic), SEEK_SET);
+	for(uint32_t i = 0; i < mh.ncmds; i++) {
+		struct load_command	*lc = read_load_command(mh.magic);
+
+		std::cout << "\t" << i << ": " << load_command_description(mh.magic, *lc) << "\n";
+
+		free(lc);
 	}
 }
-#endif
 
 struct fat_arch MachO::arch_from_mach_header(struct mach_header &mh, uint32_t size) {
 	struct fat_arch arch;

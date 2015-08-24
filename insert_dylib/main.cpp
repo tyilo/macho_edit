@@ -15,7 +15,7 @@
 #include <iostream>
 
 __attribute__((noreturn)) void usage(void) {
-	puts("Usage: insert_dylib binary_path");
+	std::cout << "Usage: insert_dylib binary_path\n";
 
 	exit(1);
 }
@@ -405,81 +405,6 @@ void remove_codesig(FILE *f, uint32_t magic, struct fat_arch *arch, struct mach_
 		fseeko(f, SWAP32(lc.cmdsize, mh->magic), SEEK_CUR);
 	}
 }*/
-
-#define RET_NAME(x) \
-	case x: \
-		return #x
-
-const char *magic_name(uint32_t magic) {
-	switch(magic) {
-		RET_NAME(FAT_MAGIC);
-		RET_NAME(FAT_CIGAM);
-		RET_NAME(MH_MAGIC);
-		RET_NAME(MH_MAGIC_64);
-		RET_NAME(MH_CIGAM);
-		RET_NAME(MH_CIGAM_64);
-	}
-
-	char *unknown;
-	asprintf(&unknown, "UNKNOWN_MAGIC (0x%x)", magic);
-	return unknown;
-}
-
-const char *cmd_name(uint32_t cmd) {
-	switch(cmd) {
-		RET_NAME(LC_SEGMENT);
-		RET_NAME(LC_SYMTAB);
-		RET_NAME(LC_SYMSEG);
-		RET_NAME(LC_THREAD);
-		RET_NAME(LC_UNIXTHREAD);
-		RET_NAME(LC_LOADFVMLIB);
-		RET_NAME(LC_IDFVMLIB);
-		RET_NAME(LC_IDENT);
-		RET_NAME(LC_FVMFILE);
-		RET_NAME(LC_PREPAGE);
-		RET_NAME(LC_DYSYMTAB);
-		RET_NAME(LC_LOAD_DYLIB);
-		RET_NAME(LC_ID_DYLIB);
-		RET_NAME(LC_LOAD_DYLINKER);
-		RET_NAME(LC_ID_DYLINKER);
-		RET_NAME(LC_PREBOUND_DYLIB);
-		RET_NAME(LC_ROUTINES);
-		RET_NAME(LC_SUB_FRAMEWORK);
-		RET_NAME(LC_SUB_UMBRELLA);
-		RET_NAME(LC_SUB_CLIENT);
-		RET_NAME(LC_SUB_LIBRARY);
-		RET_NAME(LC_TWOLEVEL_HINTS);
-		RET_NAME(LC_PREBIND_CKSUM);
-		RET_NAME(LC_LOAD_WEAK_DYLIB);
-		RET_NAME(LC_SEGMENT_64);
-		RET_NAME(LC_ROUTINES_64);
-		RET_NAME(LC_UUID);
-		RET_NAME(LC_RPATH);
-		RET_NAME(LC_CODE_SIGNATURE);
-		RET_NAME(LC_SEGMENT_SPLIT_INFO);
-		RET_NAME(LC_REEXPORT_DYLIB);
-		RET_NAME(LC_LAZY_LOAD_DYLIB);
-		RET_NAME(LC_ENCRYPTION_INFO);
-		RET_NAME(LC_DYLD_INFO);
-		RET_NAME(LC_DYLD_INFO_ONLY);
-		RET_NAME(LC_LOAD_UPWARD_DYLIB);
-		RET_NAME(LC_VERSION_MIN_MACOSX);
-		RET_NAME(LC_VERSION_MIN_IPHONEOS);
-		RET_NAME(LC_FUNCTION_STARTS);
-		RET_NAME(LC_DYLD_ENVIRONMENT);
-		RET_NAME(LC_MAIN);
-		RET_NAME(LC_DATA_IN_CODE);
-		RET_NAME(LC_SOURCE_VERSION);
-		RET_NAME(LC_DYLIB_CODE_SIGN_DRS);
-		RET_NAME(LC_ENCRYPTION_INFO_64);
-		RET_NAME(LC_LINKER_OPTION);
-		RET_NAME(LC_LINKER_OPTIMIZATION_HINT);
-	}
-
-	char *unknown;
-	asprintf(&unknown, "UNKNOWN_COMMAND (0x%x)", cmd);
-	return unknown;
-}
 
 int main(int argc, const char *argv[]) {
 	if(argc != 2) {

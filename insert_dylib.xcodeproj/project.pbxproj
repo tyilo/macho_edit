@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		551D1CAE1B89FB7C00179980 /* magicnames.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 551D1CAD1B89FB7C00179980 /* magicnames.cpp */; };
 		556AE7AC1B83C6D400414E32 /* cpuinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 556AE7AA1B83C6D400414E32 /* cpuinfo.cpp */; };
 		556AE7AF1B83E5C900414E32 /* menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 556AE7AD1B83E5C900414E32 /* menu.cpp */; };
 		55708CC21B308025002D62A8 /* insert_dylib_tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 55708CC11B308025002D62A8 /* insert_dylib_tests.m */; };
@@ -29,6 +30,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		551D1CAC1B89FB6800179980 /* magicnames.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = magicnames.h; sourceTree = "<group>"; };
+		551D1CAD1B89FB7C00179980 /* magicnames.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = magicnames.cpp; sourceTree = "<group>"; };
 		556AE7AA1B83C6D400414E32 /* cpuinfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cpuinfo.cpp; sourceTree = "<group>"; };
 		556AE7AB1B83C6D400414E32 /* cpuinfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpuinfo.h; sourceTree = "<group>"; };
 		556AE7AD1B83E5C900414E32 /* menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = menu.cpp; sourceTree = "<group>"; };
@@ -106,6 +109,8 @@
 				55F6925C1B7C2E86007413F7 /* macros.h */,
 				55F6925E1B7C2EAC007413F7 /* fileutils.h */,
 				55F6925D1B7C2EAC007413F7 /* fileutils.cpp */,
+				551D1CAC1B89FB6800179980 /* magicnames.h */,
+				551D1CAD1B89FB7C00179980 /* magicnames.cpp */,
 				556AE7AB1B83C6D400414E32 /* cpuinfo.h */,
 				556AE7AA1B83C6D400414E32 /* cpuinfo.cpp */,
 				55EB1FC11B83AD7E009F1AD1 /* macho.h */,
@@ -210,6 +215,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				551D1CAE1B89FB7C00179980 /* magicnames.cpp in Sources */,
 				55EB1FC21B83AD7E009F1AD1 /* macho.cpp in Sources */,
 				55ABCB4D19881CA600B03F31 /* main.cpp in Sources */,
 				556AE7AC1B83C6D400414E32 /* cpuinfo.cpp in Sources */,
