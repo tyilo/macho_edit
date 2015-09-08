@@ -10,15 +10,15 @@
 class MachOArch {
 public:
 // Fields
-	fat_arch raw_arch;
+	fat_arch fat_arch;
 	mach_header mach_header;
 	std::vector<LoadCommand> load_commands;
 
 // Methods
 	MachOArch();
-	MachOArch(fat_arch raw_arch, FILE *f);
+	MachOArch(struct fat_arch *fat_arch, FILE *f);
 
-	void swap_mach_header();
+	void swap_mach_header(struct mach_header *mh) const;
 
 	std::string description() const;
 	void print_load_commands() const;

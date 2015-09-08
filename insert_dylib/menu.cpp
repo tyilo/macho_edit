@@ -281,7 +281,7 @@ bool lc_config(MachO &macho) {
 	switch(o) {
 		case 0:
 			for(uint32_t i = first; i <= last; i++) {
-				auto &arch = macho.archs[i];
+				MachOArch &arch = macho.archs[i];
 				std::cout << "\n" << arch.description() << ":\n";
 
 				arch.print_load_commands();

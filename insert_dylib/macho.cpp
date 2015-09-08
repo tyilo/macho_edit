@@ -57,7 +57,7 @@ MachO::MachO(const char *filename) {
 			fat_arch arch;
 			READ(arch, file);
 			swap_arch(&arch);
-			archs.push_back(MachOArch(arch, file));
+			archs.push_back(MachOArch(&arch, file));
 		}
 	} else {
 		fat_magic = FAT_CIGAM;
@@ -69,7 +69,7 @@ MachO::MachO(const char *filename) {
 
 		fat_arch arch = arch_from_mach_header(mh, file_size);
 		swap_arch(&arch);
-		archs = {MachOArch(arch, file)};
+		archs = {MachOArch(&arch, file)};
 	}
 }
 
@@ -91,10 +91,15 @@ void MachO::write_fat_header() const {
 
 void MachO::write_fat_archs() const {
 	for(auto &arch : archs) {
-		fat_arch raw_arch = arch.raw_arch;
-		swap_arch(&raw_arch);
-		WRITE(raw_arch, file);
+		fat_arch fat_arch = arch.fat_arch;
+		swap_arch(&fat_arch);
+		WRITE(fat_arch, file);
 	}
+}
+
+void MachO::write_mach_header(MachOArch &arch) const {
+	fseeko(file, arch.fat_arch.offset, SEEK_SET);
+	WRITE(arch.mach_header, file);
 }
 
 void MachO::print_description() const {
@@ -128,9 +133,9 @@ fat_arch MachO::arch_from_mach_header(mach_header &mh, uint32_t size) const {
 void MachO::make_fat() {
 	assert(!is_fat);
 
-	auto &arch = archs[0];
+	MachOArch &arch = archs[0];
 
-	uint32_t offset = ROUND_UP(sizeof(fat_header), 1 << arch.raw_arch.align);
+	uint32_t offset = ROUND_UP(sizeof(fat_header), 1 << arch.fat_arch.align);
 
 	ftruncate(fd, file_size + offset);
 
@@ -143,7 +148,7 @@ void MachO::make_fat() {
 	fat_magic = FAT_CIGAM;
 	write_fat_header();
 
-	arch.raw_arch.offset = offset;
+	arch.fat_arch.offset = offset;
 	write_fat_archs();
 
 	fflush(file);
@@ -155,12 +160,12 @@ void MachO::make_fat() {
 void MachO::make_thin(uint32_t arch_index) {
 	assert(is_fat);
 
-	auto &arch = archs[arch_index];
+	MachOArch &arch = archs[arch_index];
 
 	archs = {arch};
 
-	uint32_t size = arch.raw_arch.size;
-	fmove(file, 0, arch.raw_arch.offset, size);
+	uint32_t size = arch.fat_arch.size;
+	fmove(file, 0, arch.fat_arch.offset, size);
 
 	fflush(file);
 	ftruncate(fd, size);
@@ -173,14 +178,14 @@ void MachO::make_thin(uint32_t arch_index) {
 }
 
 bool MachO::save_arch_to_file(uint32_t arch_index, const char *filename) const {
-	auto &arch = archs[arch_index];
+	const MachOArch &arch = archs[arch_index];
 
 	FILE *f = fopen(filename, "w");
 	if(!f) {
 		return false;
 	}
 
-	fcpy(f, 0, file, arch.raw_arch.offset, arch.raw_arch.size);
+	fcpy(f, 0, file, arch.fat_arch.offset, arch.fat_arch.size);
 
 	fclose(f);
 
@@ -190,29 +195,29 @@ bool MachO::save_arch_to_file(uint32_t arch_index, const char *filename) const {
 }
 
 void MachO::remove_arch(uint32_t arch_index) {
-	auto &arch = archs[arch_index];
+	MachOArch &arch = archs[arch_index];
 
-	fzero(file, arch.raw_arch.offset, arch.raw_arch.size);
+	fzero(file, arch.fat_arch.offset, arch.fat_arch.size);
 
 	uint32_t new_offset;
 	if(arch_index == 0) {
 		new_offset = sizeof(fat_header);
 	} else {
-		auto &prev = archs[arch_index - 1];
-		new_offset = prev.raw_arch.offset + prev.raw_arch.size;
+		fat_arch &prev_raw = archs[arch_index - 1].fat_arch;
+		new_offset = prev_raw.offset + prev_raw.size;
 	}
 
 	archs.erase(archs.begin() + arch_index);
 	n_archs--;
 
 	for(uint32_t i = arch_index; i < n_archs; i++) {
-		auto &arch = archs[i];
+		MachOArch &arch = archs[i];
 
-		uint32_t offset = arch.raw_arch.offset;
-		uint32_t size =  arch.raw_arch.size;
+		uint32_t offset = arch.fat_arch.offset;
+		uint32_t size =  arch.fat_arch.size;
 
-		new_offset = ROUND_UP(new_offset, 1 << arch.raw_arch.align);
-		arch.raw_arch.offset = new_offset;
+		new_offset = ROUND_UP(new_offset, 1 << arch.fat_arch.align);
+		arch.fat_arch.offset = new_offset;
 
 		fmove(file, new_offset, offset, size);
 		fzero(file, new_offset + size, offset - new_offset);
@@ -235,16 +240,16 @@ void MachO::insert_arch_from_macho(MachO &macho, uint32_t arch_index) {
 	n_archs++;
 
 	MachOArch arch = macho.archs[arch_index];
-	fat_arch &raw_arch = arch.raw_arch;
+	fat_arch &fat_arch = arch.fat_arch;
 
-	macho.swap_arch(&raw_arch);
-	swap_arch(&raw_arch);
+	macho.swap_arch(&fat_arch);
+	swap_arch(&fat_arch);
 
 	//arch.swap_mach_header(); ????
 
-	uint32_t offset = ROUND_UP(file_size, 1 << raw_arch.align);
+	uint32_t offset = ROUND_UP(file_size, 1 << fat_arch.align);
 
-	raw_arch.offset = offset;
+	fat_arch.offset = offset;
 
 	archs.push_back(arch);
 
@@ -253,7 +258,7 @@ void MachO::insert_arch_from_macho(MachO &macho, uint32_t arch_index) {
 	ftruncate(fd, new_size);
 	fzero(file, file_size, offset - file_size);
 
-	fcpy(file, offset, macho.file, 0, raw_arch.size);
+	fcpy(file, offset, macho.file, 0, fat_arch.size);
 
 	file_size = new_size;
 
@@ -263,15 +268,27 @@ void MachO::insert_arch_from_macho(MachO &macho, uint32_t arch_index) {
 }
 
 void MachO::remove_load_command(uint32_t arch_index, uint32_t lc_index) {
-	/*mach_header &mh = mach_headers[arch_index];
+	MachOArch &arch = archs[arch_index];
+	auto &load_commands = arch.load_commands;
 
-	load_command *lc = load_commands[arch_index][lc_index];
-*/
+	if(load_commands.size() > 1) {
+		move_load_command(arch_index, lc_index, (uint32_t)load_commands.size() - 1);
+	}
 
+	LoadCommand &lc = load_commands.back();
+
+	arch.mach_header.ncmds--;
+	arch.mach_header.sizeofcmds -= lc.cmdsize;
+
+	write_mach_header(arch);
+
+	fzero(file, lc.file_offset, lc.cmdsize);
+
+	load_commands.pop_back();
 }
 
 void MachO::move_load_command(uint32_t arch_index, uint32_t lc_index, uint32_t new_index) {
-	/*if(lc_index == new_index) {
+	if(lc_index == new_index) {
 		return;
 	}
 	if(lc_index > new_index) {
@@ -279,12 +296,26 @@ void MachO::move_load_command(uint32_t arch_index, uint32_t lc_index, uint32_t n
 		return;
 	}
 
-	mach_header &mh = mach_headers[arch_index];
-	uint32_t magic = mh.magic;
-	load_command *prev = load_commands[arch_index][lc_index];
+	MachOArch &arch = archs[arch_index];
+	auto &load_commands = arch.load_commands;
+	LoadCommand lc_to_move = load_commands[lc_index];
 
-	for(uint32_t i = lc_index + 1; i < new_index; i++) {
-		load_command *lc = load_commands[arch_index][i];
+	off_t new_offset = lc_to_move.file_offset;
+	fseeko(file, new_offset, SEEK_SET);
 
-	}*/
+	for(uint32_t i = lc_index + 1; i <= new_index; i++) {
+		LoadCommand &lc = load_commands[i];
+		lc.file_offset = new_offset;
+
+		fwrite(lc.raw_lc, lc.cmdsize, 1, file);
+
+		new_offset += lc.cmdsize;
+	}
+
+	lc_to_move.file_offset = new_offset;
+	fseeko(file, new_offset, SEEK_SET);
+	fwrite(lc_to_move.raw_lc, lc_to_move.cmdsize, 1, file);
+
+	load_commands.erase(load_commands.begin() + lc_index);
+	load_commands.push_back(lc_to_move);
 }

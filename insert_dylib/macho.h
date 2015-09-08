@@ -32,6 +32,7 @@ public:
 
 	void write_fat_header() const;
 	void write_fat_archs() const;
+	void write_mach_header(MachOArch &arch) const;
 
 	void print_description() const;
 

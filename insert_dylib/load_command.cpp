@@ -26,11 +26,9 @@ LoadCommand::LoadCommand(uint32_t magic, FILE *f) {
 
 	raw_lc = (load_command *)malloc(cmdsize);
 	fread((void *)raw_lc, cmdsize, 1, f);
-	//std::cout << "Alloc: " << (void *)raw_lc << "\n";
 }
 
 LoadCommand::~LoadCommand() {
-	//std::cout << "Free: " << (void *)raw_lc << "\n";
 	free(raw_lc);
 }
 
