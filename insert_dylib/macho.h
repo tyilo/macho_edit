@@ -4,9 +4,11 @@
 #include <string>
 #include <vector>
 
-#include <cstdio>
+#include <stdio.h>
 #include <mach-o/fat.h>
 #include <mach-o/loader.h>
+
+#include "macho_arch.h"
 
 class MachO {
 public:
@@ -20,36 +22,30 @@ public:
 	bool is_fat;
 	uint32_t n_archs;
 
-	std::vector<struct fat_arch> archs;
-
-	std::vector<struct mach_header> mach_headers;
+	std::vector<MachOArch> archs;
 
 // Methods
 	MachO();
 	MachO(const char *filename);
 
-	void swap_arch(struct fat_arch *arch);
-	void swap_mach_header(struct mach_header *mh);
+	void swap_arch(fat_arch *arch) const;
 
-	void write_fat_header();
-	void write_fat_archs();
+	void write_fat_header() const;
+	void write_fat_archs() const;
 
-	std::string arch_description(struct fat_arch &arch);
-	void print_description();
+	void print_description() const;
 
-	struct load_command *read_load_command(uint32_t magic);
-	char *get_lc_str(uint32_t magic, struct load_command &lc, union lc_str lc_str);
-	std::string load_command_description(uint32_t magic, struct load_command &lc);
-	void print_load_commands(uint32_t arch_index);
-
-	struct fat_arch arch_from_mach_header(struct mach_header &mach_header, uint32_t size);
+	fat_arch arch_from_mach_header(mach_header &mach_header, uint32_t size) const;
 
 	void make_fat();
 	void make_thin(uint32_t arch_index);
 
-	std::string extract_arch(uint32_t arch_index);
+	bool save_arch_to_file(uint32_t arch_index, const char *filename) const;
 	void remove_arch(uint32_t arch_index);
-	void insert_arch(MachO &macho, uint32_t arch_index);
+	void insert_arch_from_macho(MachO &macho, uint32_t arch_index);
+
+	void remove_load_command(uint32_t arch_index, uint32_t lc_index);
+	void move_load_command(uint32_t arch_index, uint32_t lc_index, uint32_t new_index);
 };
 
 #endif

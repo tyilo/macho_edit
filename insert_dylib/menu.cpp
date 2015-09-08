@@ -87,7 +87,7 @@ size_t select_option(const char *header, std::vector<std::string> options) {
 uint32_t select_arch(MachO &macho, const char *header, bool allow_all) {
 	std::vector<std::string> arch_options;
 	for(auto &arch : macho.archs) {
-		arch_options.push_back(macho.arch_description(arch));
+		arch_options.push_back(arch.description());
 	}
 
 	uint32_t cancel_index = macho.n_archs;
@@ -104,6 +104,23 @@ uint32_t select_arch(MachO &macho, const char *header, bool allow_all) {
 	}
 	if(allow_all && o == cancel_index - 1) {
 		return ALL;
+	}
+
+	return o;
+}
+
+uint32_t select_load_command(MachOArch &arch, const char *header) {
+	std::vector<std::string> lc_options;
+	for(auto &lc : arch.load_commands) {
+		lc_options.push_back(lc.description());
+	}
+
+	lc_options.push_back("Cancel");
+
+	uint32_t o = (uint32_t)select_option(header, lc_options);
+
+	if(o == lc_options.size() - 1) {
+		return CANCEL;
 	}
 
 	return o;
@@ -163,9 +180,15 @@ bool fat_config(MachO &macho) {
 					break;
 				}
 
-				std::string path = macho.extract_arch(arch);
+				std::cout << "Path to save arch to: ";
+				std::string path;
+				readline(path);
 
-				std::cout << "Arch extracted to: " << path << "\n";
+				if(macho.save_arch_to_file(arch, path.c_str())) {
+					std::cout << "Arch successfully extracted.\n";
+				} else {
+					std::cout << "Failed to extract arch!\n";
+				}
 
 				break;
 			}
@@ -194,7 +217,7 @@ bool fat_config(MachO &macho) {
 				MachO macho_in;
 				try {
 					macho_in = MachO(path.c_str());
-				} catch(std::string err) {
+				} catch(const std::string &err) {
 					std::cout << err << "\n";
 					break;
 				} catch(const char *err) {
@@ -216,7 +239,7 @@ bool fat_config(MachO &macho) {
 					}
 				}
 
-				macho.insert_arch(macho_in, insert_arch);
+				macho.insert_arch_from_macho(macho_in, insert_arch);
 
 				break;
 			}
@@ -233,19 +256,20 @@ bool lc_config(MachO &macho) {
 		"List load commands",
 		"Remove load command",
 		"Insert load command",
+		"Move load command",
 		"Remove code signature",
 		"Cancel"
 	};
 
 	size_t o = select_option("", lc_options);
 
-	if(o == 4) {
+	if(o == 5) {
 		return false;
 	}
 
 	uint32_t arch = 0;
 	if(macho.n_archs > 1) {
-		arch = select_arch(macho, "Pick arch to edit:", o == 0 || o == 1);
+		arch = select_arch(macho, "Pick arch to edit:", o == 0);
 		if(arch == CANCEL) {
 			return false;
 		}
@@ -258,19 +282,24 @@ bool lc_config(MachO &macho) {
 		case 0:
 			for(uint32_t i = first; i <= last; i++) {
 				auto &arch = macho.archs[i];
-				std::cout << "\n" << macho.arch_description(arch) << ":\n";
+				std::cout << "\n" << arch.description() << ":\n";
 
-				macho.print_load_commands(i);
+				arch.print_load_commands();
 			}
 			break;
-		case 1:
-			for(uint32_t i = first; i <= last; i++) {
-
-			}
+		case 1: {
+			uint32_t lc = select_load_command(macho.archs[arch], "Select a load command to remove:\n");
+			macho.remove_load_command(arch, lc);
 			break;
+		}
 		case 2:
+			
+
 			break;
-		case 3: {
+		case 3:
+
+			break;
+		case 4: {
 			for(uint32_t i = first; i <= last; i++) {
 				//remove_codesig();
 			}

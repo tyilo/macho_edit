@@ -15,37 +15,27 @@
 #include <iostream>
 
 __attribute__((noreturn)) void usage(void) {
-	std::cout << "Usage: insert_dylib binary_path\n";
+	std::cout << "Usage: macho_edit binary_path\n";
 
 	exit(1);
 }
 
 /*
-void *read_load_command(FILE *f, uint32_t cmdsize) {
-	void *lc = malloc(cmdsize);
-
-	fpeek(lc, cmdsize, 1, f);
-
-	return lc;
-}
- */
-
-/*
-bool check_load_commands(FILE *f, struct mach_header *mh, size_t header_offset, size_t commands_offset, const char *dylib_path, off_t *slice_size) {
+bool check_load_commands(FILE *f, mach_header *mh, size_t header_offset, size_t commands_offset, const char *dylib_path, off_t *slice_size) {
 	fseeko(f, commands_offset, SEEK_SET);
 
 	uint32_t ncmds = SWAP32(mh->ncmds, mh->magic);
 
 	off_t linkedit_32_pos = -1;
 	off_t linkedit_64_pos = -1;
-	struct segment_command linkedit_32;
-	struct segment_command_64 linkedit_64;
+	segment_command linkedit_32;
+	segment_command_64 linkedit_64;
 
 	off_t symtab_pos = -1;
 	uint32_t symtab_size = 0;
 
 	for(int i = 0; i < ncmds; i++) {
-		struct load_command lc;
+		load_command lc;
 		fpeek(&lc, sizeof(lc), 1, f);
 
 		uint32_t cmdsize = SWAP32(lc.cmdsize, mh->magic);
@@ -62,7 +52,7 @@ bool check_load_commands(FILE *f, struct mach_header *mh, size_t header_offset, 
 						return true;
 					}
 
-					struct linkedit_data_command *cmd = read_load_command(f, cmdsize);
+					linkedit_data_command *cmd = read_load_command(f, cmdsize);
 
 					fbzero(f, ftello(f), cmdsize);
 
@@ -97,7 +87,7 @@ bool check_load_commands(FILE *f, struct mach_header *mh, size_t header_offset, 
 									fprintf(stderr, "Warning: LC_SYMTAB load command not found. codesign might not work on the patched binary.\n");
 								} else {
 									fseeko(f, symtab_pos, SEEK_SET);
-									struct symtab_command *symtab = read_load_command(f, symtab_size);
+									symtab_command *symtab = read_load_command(f, symtab_size);
 
 									uint32_t strsize = SWAP32(symtab->strsize, mh->magic);
 									int64_t diff_size = SWAP32(symtab->stroff, mh->magic) + strsize - (int64_t)*slice_size;
@@ -147,7 +137,7 @@ bool check_load_commands(FILE *f, struct mach_header *mh, size_t header_offset, 
 				break;
 			case LC_LOAD_DYLIB:
 			case LC_LOAD_WEAK_DYLIB: {
-				struct dylib_command *dylib_command = read_load_command(f, cmdsize);
+				dylib_command *dylib_command = read_load_command(f, cmdsize);
 
 				union lc_str offset = dylib_command->dylib.name;
 				char *name = &((char *)dylib_command)[SWAP32(offset.offset, mh->magic)];
@@ -167,14 +157,14 @@ bool check_load_commands(FILE *f, struct mach_header *mh, size_t header_offset, 
 			case LC_SEGMENT:
 			case LC_SEGMENT_64:
 				if(cmd == LC_SEGMENT) {
-					struct segment_command *cmd = read_load_command(f, cmdsize);
+					segment_command *cmd = read_load_command(f, cmdsize);
 					if(strcmp(cmd->segname, "__LINKEDIT") == 0) {
 						linkedit_32_pos = ftello(f);
 						linkedit_32 = *cmd;
 					}
 					free(cmd);
 				} else {
-					struct segment_command_64 *cmd = read_load_command(f, cmdsize);
+					segment_command_64 *cmd = read_load_command(f, cmdsize);
 					if(strcmp(cmd->segname, "__LINKEDIT") == 0) {
 						linkedit_64_pos = ftello(f);
 						linkedit_64 = *cmd;
@@ -195,15 +185,15 @@ bool check_load_commands(FILE *f, struct mach_header *mh, size_t header_offset, 
 bool insert_dylib(FILE *f, size_t header_offset, const char *dylib_path, off_t *slice_size) {
 	fseeko(f, header_offset, SEEK_SET);
 
-	struct mach_header mh;
-	fread(&mh, sizeof(struct mach_header), 1, f);
+	mach_header mh;
+	fread(&mh, sizeof(mach_header), 1, f);
 
 	if(mh.magic != MH_MAGIC_64 && mh.magic != MH_CIGAM_64 && mh.magic != MH_MAGIC && mh.magic != MH_CIGAM) {
 		printf("Unknown magic: 0x%x\n", mh.magic);
 		return false;
 	}
 
-	size_t commands_offset = header_offset + (IS_64_BIT(mh.magic)? sizeof(struct mach_header_64): sizeof(struct mach_header));
+	size_t commands_offset = header_offset + (IS_64_BIT(mh.magic)? sizeof(mach_header_64): sizeof(mach_header));
 
 	bool cont = check_load_commands(f, &mh, header_offset, commands_offset, dylib_path, slice_size);
 
@@ -216,13 +206,13 @@ bool insert_dylib(FILE *f, size_t header_offset, const char *dylib_path, off_t *
 
 	size_t dylib_path_len = strlen(dylib_path);
 	size_t dylib_path_size = (dylib_path_len & ~(path_padding - 1)) + path_padding;
-	uint32_t cmdsize = (uint32_t)(sizeof(struct dylib_command) + dylib_path_size);
+	uint32_t cmdsize = (uint32_t)(sizeof(dylib_command) + dylib_path_size);
 
-	struct dylib_command dylib_command = {
+	dylib_command dylib_command = {
 		.cmd = SWAP32(weak_flag? LC_LOAD_WEAK_DYLIB: LC_LOAD_DYLIB, mh.magic),
 		.cmdsize = SWAP32(cmdsize, mh.magic),
 		.dylib = {
-			.name = SWAP32(sizeof(struct dylib_command), mh.magic),
+			.name = SWAP32(sizeof(dylib_command), mh.magic),
 			.timestamp = 0,
 			.current_version = 0,
 			.compatibility_version = 0
@@ -275,7 +265,7 @@ bool insert_dylib(FILE *f, size_t header_offset, const char *dylib_path, off_t *
 
 }
 
-void remove_codesig(FILE *f, uint32_t magic, struct fat_arch *arch, struct mach_header *mh) {
+void remove_codesig(FILE *f, uint32_t magic, fat_arch *arch, mach_header *mh) {
 	fseeko(f, SWAP32(arch->offset, magic), SEEK_SET);
 
 	uint32_t size = SWAP32(arch->size, magic);
@@ -284,14 +274,14 @@ void remove_codesig(FILE *f, uint32_t magic, struct fat_arch *arch, struct mach_
 
 	off_t linkedit_32_pos = -1;
 	off_t linkedit_64_pos = -1;
-	struct segment_command linkedit_32;
-	struct segment_command_64 linkedit_64;
+	segment_command linkedit_32;
+	segment_command_64 linkedit_64;
 
 	off_t symtab_pos = -1;
 	uint32_t symtab_size = 0;
 
 	for(int i = 0; i < ncmds; i++) {
-		struct load_command lc;
+		load_command lc;
 		fpeek(&lc, sizeof(lc), 1, f);
 
 		uint32_t cmdsize = SWAP32(lc.cmdsize, mh->magic);
@@ -300,7 +290,7 @@ void remove_codesig(FILE *f, uint32_t magic, struct fat_arch *arch, struct mach_
 		switch(cmd) {
 			case LC_CODE_SIGNATURE:
 				if(i == ncmds - 1) {
-					struct linkedit_data_command *cmd = read_load_command(f, cmdsize);
+					linkedit_data_command *cmd = read_load_command(f, cmdsize);
 
 					fzero(f, ftello(f), cmdsize);
 
@@ -334,7 +324,7 @@ void remove_codesig(FILE *f, uint32_t magic, struct fat_arch *arch, struct mach_
 									fprintf(stderr, "Warning: LC_SYMTAB load command not found. codesign might not work on the patched binary.\n");
 								} else {
 									fseeko(f, symtab_pos, SEEK_SET);
-									struct symtab_command *symtab = read_load_command(f, symtab_size);
+									symtab_command *symtab = read_load_command(f, symtab_size);
 
 									uint32_t strsize = SWAP32(symtab->strsize, mh->magic);
 									int64_t diff_size = SWAP32(symtab->stroff, mh->magic) + strsize - (int64_t)*slice_size;
@@ -383,14 +373,14 @@ void remove_codesig(FILE *f, uint32_t magic, struct fat_arch *arch, struct mach_
 			case LC_SEGMENT:
 			case LC_SEGMENT_64:
 				if(cmd == LC_SEGMENT) {
-					struct segment_command *cmd = read_load_command(f, cmdsize);
+					segment_command *cmd = read_load_command(f, cmdsize);
 					if(strcmp(cmd->segname, "__LINKEDIT") == 0) {
 						linkedit_32_pos = ftello(f);
 						linkedit_32 = *cmd;
 					}
 					free(cmd);
 				} else {
-					struct segment_command_64 *cmd = read_load_command(f, cmdsize);
+					segment_command_64 *cmd = read_load_command(f, cmdsize);
 					if(strcmp(cmd->segname, "__LINKEDIT") == 0) {
 						linkedit_64_pos = ftello(f);
 						linkedit_64 = *cmd;

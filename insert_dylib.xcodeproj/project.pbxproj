@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		551945601B9F719300C10918 /* load_command.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5519455E1B9F719300C10918 /* load_command.cpp */; };
+		551945631B9F78D000C10918 /* macho_arch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 551945611B9F78D000C10918 /* macho_arch.cpp */; };
 		551D1CAE1B89FB7C00179980 /* magicnames.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 551D1CAD1B89FB7C00179980 /* magicnames.cpp */; };
 		556AE7AC1B83C6D400414E32 /* cpuinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 556AE7AA1B83C6D400414E32 /* cpuinfo.cpp */; };
 		556AE7AF1B83E5C900414E32 /* menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 556AE7AD1B83E5C900414E32 /* menu.cpp */; };
@@ -30,6 +32,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5519455E1B9F719300C10918 /* load_command.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = load_command.cpp; sourceTree = "<group>"; };
+		5519455F1B9F719300C10918 /* load_command.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = load_command.h; sourceTree = "<group>"; };
+		551945611B9F78D000C10918 /* macho_arch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = macho_arch.cpp; sourceTree = "<group>"; };
+		551945621B9F78D000C10918 /* macho_arch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = macho_arch.h; sourceTree = "<group>"; };
 		551D1CAC1B89FB6800179980 /* magicnames.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = magicnames.h; sourceTree = "<group>"; };
 		551D1CAD1B89FB7C00179980 /* magicnames.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = magicnames.cpp; sourceTree = "<group>"; };
 		556AE7AA1B83C6D400414E32 /* cpuinfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cpuinfo.cpp; sourceTree = "<group>"; };
@@ -113,6 +119,10 @@
 				551D1CAD1B89FB7C00179980 /* magicnames.cpp */,
 				556AE7AB1B83C6D400414E32 /* cpuinfo.h */,
 				556AE7AA1B83C6D400414E32 /* cpuinfo.cpp */,
+				5519455F1B9F719300C10918 /* load_command.h */,
+				5519455E1B9F719300C10918 /* load_command.cpp */,
+				551945621B9F78D000C10918 /* macho_arch.h */,
+				551945611B9F78D000C10918 /* macho_arch.cpp */,
 				55EB1FC11B83AD7E009F1AD1 /* macho.h */,
 				55EB1FC01B83AD7E009F1AD1 /* macho.cpp */,
 				556AE7AE1B83E5C900414E32 /* menu.h */,
@@ -219,7 +229,9 @@
 				55EB1FC21B83AD7E009F1AD1 /* macho.cpp in Sources */,
 				55ABCB4D19881CA600B03F31 /* main.cpp in Sources */,
 				556AE7AC1B83C6D400414E32 /* cpuinfo.cpp in Sources */,
+				551945631B9F78D000C10918 /* macho_arch.cpp in Sources */,
 				556AE7AF1B83E5C900414E32 /* menu.cpp in Sources */,
+				551945601B9F719300C10918 /* load_command.cpp in Sources */,
 				55F6925F1B7C2EAC007413F7 /* fileutils.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
