@@ -1,9 +1,12 @@
-#include "menu.h"
-
-#include <stdio.h>
-#include <stdarg.h>
-
 #include <iostream>
+
+#include <stdarg.h>
+#include <stdio.h>
+#include <sys/stat.h>
+
+#include "macros.h"
+#include "magicnames.h"
+#include "menu.h"
 
 __attribute__((format(printf, 1, 2))) bool ask(const char *format, ...) {
 	char *question;
@@ -232,14 +235,18 @@ bool fat_config(MachO &macho) {
 
 				uint32_t insert_arch = 0;
 				if(macho_in.n_archs > 1) {
-					// XXX: Support ALL
 					insert_arch = select_arch(macho_in, "Binary contains multiple archs.\nPlease choose which one to insert:", true);
 					if(insert_arch == CANCEL) {
 						break;
 					}
 				}
 
-				macho.insert_arch_from_macho(macho_in, insert_arch);
+				uint32_t first = insert_arch == ALL? 0: insert_arch;
+				uint32_t last = insert_arch == ALL? macho_in.n_archs - 1: insert_arch;
+
+				for(uint32_t i = first; i <= last; i++) {
+					macho.insert_arch_from_macho(macho_in, i);
+				}
 
 				break;
 			}
@@ -249,6 +256,99 @@ bool fat_config(MachO &macho) {
 	}
 
 	return true;
+}
+
+bool ask_for_path(const char *prompt, std::string &path) {
+	std::cout << prompt << " ";
+	readline(path);
+
+	struct stat s;
+	if(path[0] != '@' && stat(path.c_str(), &s) != 0) {
+		if(!ask("The path doesn't exist. Continue?")) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+#define PATH_PADDING 8
+
+load_command *get_path_cmd(const char *prompt, size_t header_size, uint32_t *cmdsize) {
+	std::string path;
+	if(!ask_for_path(prompt, path)) {
+		return NULL;
+	}
+
+	uint32_t path_size = (uint32_t)ROUND_UP(path.length() + 1, PATH_PADDING);
+	*cmdsize = (uint32_t)header_size + path_size;
+
+	load_command *lc = (load_command *)malloc(*cmdsize);
+	memcpy(((uint8_t *)lc) + header_size, path.c_str(), path.length());
+	return lc;
+}
+
+void lc_insert(MachO &macho, uint32_t arch) {
+	static uint32_t insertable_cmds[] = {
+		LC_LOAD_DYLIB,
+		LC_LOAD_WEAK_DYLIB,
+		LC_RPATH
+	};
+
+	std::vector<std::string> options;
+
+	for(uint32_t i = 0; i < ELEMENTS(insertable_cmds); i++) {
+		options.push_back(cmd_name(insertable_cmds[i]));
+	}
+
+	options.push_back("Cancel");
+
+	size_t o = select_option("Select the cmd you want to insert:", options);
+	if(o == ELEMENTS(insertable_cmds)) {
+		return;
+	}
+
+	uint32_t cmd = insertable_cmds[o];
+
+	uint32_t magic = macho.archs[arch].mach_header.magic;
+
+	load_command *lc = NULL;
+
+	switch(cmd) {
+		case LC_LOAD_DYLIB:
+		case LC_LOAD_WEAK_DYLIB: {
+			uint32_t cmdsize;
+			if((lc = get_path_cmd("Dylib path:", sizeof(dylib_command), &cmdsize))) {
+				auto *c = (dylib_command *)lc;
+				c->cmd = SWAP32(cmd, magic);
+				c->cmdsize = SWAP32(cmdsize, magic);
+				c->dylib = {
+					.name.offset = SWAP32(sizeof(dylib_command), magic),
+					.timestamp = 0,
+					.current_version = 0,
+					.compatibility_version = 0
+				};
+			}
+
+			break;
+		}
+		case LC_RPATH: {
+			uint32_t cmdsize;
+			if((lc = get_path_cmd("Runpath:", sizeof(dylib_command), &cmdsize))) {
+				auto *c = (rpath_command *)lc;
+				c->cmd = SWAP32(cmd, magic);
+				c->cmdsize = SWAP32(cmdsize, magic);
+				c->path.offset = SWAP32(sizeof(dylib_command), magic);
+			}
+
+			break;
+		}
+	}
+
+	if(lc) {
+		macho.insert_load_command(arch, lc);
+		free(lc);
+	}
 }
 
 bool lc_config(MachO &macho) {
@@ -293,12 +393,17 @@ bool lc_config(MachO &macho) {
 			break;
 		}
 		case 2:
-			
+			lc_insert(macho, arch);
 
 			break;
-		case 3:
+		case 3: {
+			uint32_t lc1 = select_load_command(macho.archs[arch], "Select a load command to move:\n");
+			uint32_t lc2 = select_load_command(macho.archs[arch], "Select load command to swap with:\n");
+
+			macho.move_load_command(arch, lc1, lc2);
 
 			break;
+		}
 		case 4: {
 			for(uint32_t i = first; i <= last; i++) {
 				//remove_codesig();

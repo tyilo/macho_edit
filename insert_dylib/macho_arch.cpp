@@ -2,9 +2,9 @@
 #include <sstream>
 
 #include "cpuinfo.h"
-#include "macros.h"
 #include "fileutils.h"
 #include "macho_arch.h"
+#include "macros.h"
 
 MachOArch::MachOArch() {
 }

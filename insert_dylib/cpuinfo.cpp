@@ -1,6 +1,6 @@
-#include "cpuinfo.h"
-
 #include <sstream>
+
+#include "cpuinfo.h"
 
 uint32_t cpu_pagesize(cpu_type_t cputype) {
 	switch(cputype) {

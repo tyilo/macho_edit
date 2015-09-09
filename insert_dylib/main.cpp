@@ -1,18 +1,6 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdarg.h>
-#include <string.h>
-#include <unistd.h>
-#include <getopt.h>
-#include <sys/stat.h>
-#include <copyfile.h>
-#include <mach-o/loader.h>
-#include <mach-o/fat.h>
+#include <iostream>
 
 #include "menu.h"
-
-#include <iostream>
 
 __attribute__((noreturn)) void usage(void) {
 	std::cout << "Usage: macho_edit binary_path\n";

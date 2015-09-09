@@ -1,9 +1,9 @@
-#include "magicnames.h"
+#include <sstream>
 
 #include <mach-o/fat.h>
 #include <mach-o/loader.h>
 
-#include <sstream>
+#include "magicnames.h"
 
 #define RET_NAME(x) \
 	case x: \

@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include <stdio.h>
 #include <mach-o/loader.h>
+#include <stdio.h>
 
 class LoadCommand {
 public:
@@ -18,10 +18,11 @@ public:
 // Methods
 	LoadCommand();
 	LoadCommand(uint32_t magic, FILE *f);
+	LoadCommand(uint32_t magic, off_t file_offset, load_command *raw_lc);
 	~LoadCommand();
 
 	LoadCommand(const LoadCommand &other);
 
-	char *get_lc_str(union lc_str lc_str) const;
+	std::string get_lc_str(union lc_str lc_str) const;
 	std::string description() const;
 };

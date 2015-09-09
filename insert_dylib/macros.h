@@ -1,5 +1,4 @@
-#ifndef insert_dylib_macros_h
-#define insert_dylib_macros_h
+#pragma once
 
 #define MIN(x, y) ((x) < (y)? (x): (y))
 #define MAX(x, y) ((x) > (y)? (x): (y))
@@ -12,7 +11,7 @@
 #define IS_MAGIC(x) (IS_FAT(x) || IS_THIN(x))
 #define IS_64_BIT(x) ((x) == MH_MAGIC_64 || (x) == MH_CIGAM_64)
 #define IS_BIG_ENDIAN(x) ((x) == FAT_CIGAM || (x) == MH_CIGAM_64 || (x) == MH_CIGAM)
-#define SWAP32(x, magic) (IS_BIG_ENDIAN(magic)? OSSwapInt32(x): (x))
+#define SWAP32(x, magic) (IS_BIG_ENDIAN(magic)? OSSwapInt32((uint32_t)x): ((uint32_t)x))
 #define SWAP64(x, magic) (IS_BIG_ENDIAN(magic)? OSSwapInt64(x): (x))
 #define MH_SIZE(magic) (IS_64_BIT(magic)? sizeof(mach_header_64): sizeof(mach_header))
 
@@ -23,5 +22,3 @@
 #define READ(x, f)  fread(&x, sizeof(x), 1, f)
 #define WRITE(x, f) fwrite(&x, sizeof(x), 1, f)
 #define PEEK(x, f)  fpeek(&x, sizeof(x), 1, f)
-
-#endif

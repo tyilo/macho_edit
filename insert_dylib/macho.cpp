@@ -1,18 +1,17 @@
-#include "macho.h"
-
-#include "macros.h"
-#include "fileutils.h"
-#include "magicnames.h"
-#include "cpuinfo.h"
-
-#include <assert.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
+#include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <iomanip>
+
+#include <assert.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#include "cpuinfo.h"
+#include "fileutils.h"
+#include "macho.h"
+#include "macros.h"
+#include "magicnames.h"
 
 MachO::MachO() {
 }
@@ -318,4 +317,29 @@ void MachO::move_load_command(uint32_t arch_index, uint32_t lc_index, uint32_t n
 
 	load_commands.erase(load_commands.begin() + lc_index);
 	load_commands.push_back(lc_to_move);
+}
+
+void MachO::insert_load_command(uint32_t arch_index, load_command *raw_lc) {
+	MachOArch &arch = archs[arch_index];
+
+	uint32_t offset;
+	if(arch.load_commands.size() == 0) {
+		offset = arch.fat_arch.offset + arch.fat_arch.size;
+	} else {
+		LoadCommand &last_lc = arch.load_commands.back();
+		offset = (uint32_t)(last_lc.file_offset + last_lc.cmdsize);
+	}
+
+	uint32_t magic = arch.mach_header.magic;
+	uint32_t cmdsize = SWAP32(raw_lc->cmdsize, magic);
+
+	fseeko(file, offset, SEEK_SET);
+	fwrite(raw_lc, cmdsize, 1, file);
+
+	arch.load_commands.push_back(LoadCommand(magic, offset, raw_lc));
+
+	arch.mach_header.ncmds++;
+	arch.mach_header.sizeofcmds += cmdsize;
+
+	write_mach_header(arch);
 }

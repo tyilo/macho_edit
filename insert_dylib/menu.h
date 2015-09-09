@@ -1,11 +1,8 @@
-#ifndef __insert_dylib__menu__
-#define __insert_dylib__menu__
-
-#include "macho.h"
+#pragma once
 
 #include <string>
 #include <vector>
 
-bool main_menu(MachO &macho);
+#include "macho.h"
 
-#endif
+bool main_menu(MachO &macho);

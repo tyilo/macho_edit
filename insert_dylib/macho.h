@@ -1,12 +1,11 @@
-#ifndef __insert_dylib__macho__
-#define __insert_dylib__macho__
+#pragma once
 
 #include <string>
 #include <vector>
 
-#include <stdio.h>
 #include <mach-o/fat.h>
 #include <mach-o/loader.h>
+#include <stdio.h>
 
 #include "macho_arch.h"
 
@@ -47,6 +46,5 @@ public:
 
 	void remove_load_command(uint32_t arch_index, uint32_t lc_index);
 	void move_load_command(uint32_t arch_index, uint32_t lc_index, uint32_t new_index);
+	void insert_load_command(uint32_t arch_index, load_command *raw_lc);
 };
-
-#endif

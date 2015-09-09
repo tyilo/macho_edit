@@ -1,15 +1,14 @@
-//#include <iostream>
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 
-#include <stdlib.h>
 #include <mach-o/fat.h>
 #include <mach-o/loader.h>
+#include <stdlib.h>
 
-#include "magicnames.h"
-#include "macros.h"
 #include "fileutils.h"
 #include "load_command.h"
+#include "macros.h"
+#include "magicnames.h"
 
 LoadCommand::LoadCommand() {
 }
@@ -28,6 +27,17 @@ LoadCommand::LoadCommand(uint32_t magic, FILE *f) {
 	fread((void *)raw_lc, cmdsize, 1, f);
 }
 
+LoadCommand::LoadCommand(uint32_t magic, off_t file_offset, load_command *raw_lc) {
+	this->magic = magic;
+	this->file_offset = file_offset;
+
+	cmd = SWAP32(raw_lc->cmd, magic);
+	cmdsize = SWAP32(raw_lc->cmdsize, magic);
+
+	this->raw_lc = (load_command *)malloc(cmdsize);
+	memcpy(this->raw_lc, raw_lc, cmdsize);
+}
+
 LoadCommand::~LoadCommand() {
 	free(raw_lc);
 }
@@ -39,9 +49,11 @@ LoadCommand::LoadCommand(const LoadCommand &other) {
 	memcpy(raw_lc, other.raw_lc, cmdsize);
 }
 
-char *LoadCommand::get_lc_str(lc_str lc_str) const {
+std::string LoadCommand::get_lc_str(lc_str lc_str) const {
 	char *ptr = (char *)raw_lc;
-	return &ptr[SWAP32(lc_str.offset, magic)];
+
+	uint32_t offset = SWAP32(lc_str.offset, magic);
+	return std::string(&ptr[offset], cmdsize - offset);
 }
 
 std::string LoadCommand::description() const {
@@ -133,6 +145,13 @@ std::string LoadCommand::description() const {
 			auto *c = (dylib_command *)raw_lc;
 
 			o << ": " << get_lc_str(c->dylib.name);
+
+			break;
+		}
+		case LC_RPATH: {
+			auto *c = (rpath_command *)raw_lc;
+
+			o << ": " << get_lc_str(c->path);
 
 			break;
 		}
