@@ -80,6 +80,11 @@ void MachO::swap_arch(fat_arch *arch) const {
 }
 
 void MachO::write_fat_header() const {
+	if(!is_fat) {
+		return;
+	}
+
+	rewind(file);
 	fat_header fat_header;
 
 	fat_header.magic = fat_magic;
@@ -88,17 +93,45 @@ void MachO::write_fat_header() const {
 	WRITE(fat_header, file);
 }
 
-void MachO::write_fat_archs() const {
+void MachO::write_fat_archs() {
+	if(!is_fat) {
+		const MachOArch &arch = archs[0];
+		uint32_t arch_size = arch.fat_arch.size;
+		if(file_size != arch_size) {
+			fflush(file);
+			ftruncate(fd, arch_size);
+			file_size = arch_size;
+		}
+		return;
+	}
+
+	fseeko(file, sizeof(fat_header), SEEK_SET);
 	for(auto &arch : archs) {
 		fat_arch fat_arch = arch.fat_arch;
 		swap_arch(&fat_arch);
 		WRITE(fat_arch, file);
+	}
+
+	if(n_archs > 0) {
+		fat_arch &fat_arch = archs.back().fat_arch;
+		uint32_t new_size = fat_arch.offset + fat_arch.size;
+		if(new_size != file_size) {
+			fflush(file);
+			ftruncate(fd, new_size);
+
+			file_size = new_size;
+		}
 	}
 }
 
 void MachO::write_mach_header(MachOArch &arch) const {
 	fseeko(file, arch.fat_arch.offset, SEEK_SET);
 	WRITE(arch.mach_header, file);
+}
+
+void MachO::write_load_command(LoadCommand &lc) const {
+	fseeko(file, lc.file_offset, SEEK_SET);
+	fwrite(lc.raw_lc, lc.cmdsize, 1, file);
 }
 
 void MachO::print_description() const {
@@ -140,8 +173,6 @@ void MachO::make_fat() {
 
 	fmove(file, offset, 0, file_size);
 	fzero(file, offset, 0);
-
-	rewind(file);
 
 	// dyld doesn't like FAT_MAGIC
 	fat_magic = FAT_CIGAM;
@@ -224,8 +255,6 @@ void MachO::remove_arch(uint32_t arch_index) {
 		new_offset += size;
 	}
 
-	rewind(file);
-
 	write_fat_header();
 	write_fat_archs();
 
@@ -261,7 +290,6 @@ void MachO::insert_arch_from_macho(MachO &macho, uint32_t arch_index) {
 
 	file_size = new_size;
 
-	rewind(file);
 	write_fat_header();
 	write_fat_archs();
 }
@@ -342,4 +370,99 @@ void MachO::insert_load_command(uint32_t arch_index, load_command *raw_lc) {
 	arch.mach_header.sizeofcmds += cmdsize;
 
 	write_mach_header(arch);
+}
+
+bool MachO::remove_codesignature(uint32_t arch_index) {
+	MachOArch &arch = archs[arch_index];
+	uint32_t magic = arch.mach_header.magic;
+
+	LoadCommand *codesig_lc = NULL;
+	uint32_t codesig_index = -1;
+	LoadCommand *linkedit_lc = NULL;
+	LoadCommand *symtab_lc = NULL;
+
+	uint32_t i = 0;
+	for(LoadCommand &lc : arch.load_commands) {
+		switch(lc.cmd) {
+			case LC_CODE_SIGNATURE:
+				codesig_lc = &lc;
+				codesig_index = i;
+				break;
+			case LC_SEGMENT:
+			case LC_SEGMENT_64: {
+				auto *c = (segment_command *)&lc;
+				if(strncmp(c->segname, "__LINKEDIT", sizeof(c->segname))) {
+					linkedit_lc = &lc;
+				}
+				break;
+			}
+			case LC_SYMTAB:
+				symtab_lc = &lc;
+				break;
+		}
+		i++;
+	}
+
+	if(!codesig_lc || !linkedit_lc) {
+		return false;
+	}
+
+	linkedit_data_command *codesig_cmd = (linkedit_data_command *)codesig_lc->raw_lc;
+	uint32_t codesig_offset = SWAP32(codesig_cmd->dataoff, magic);
+	uint32_t codesig_size = SWAP32(codesig_cmd->datasize, magic);
+
+	if(codesig_offset + codesig_size != arch.fat_arch.size) {
+		return false;
+	}
+
+	uint64_t linkedit_offset;
+	uint64_t linkedit_size;
+	if(linkedit_lc->cmd == LC_SEGMENT) {
+		auto *c = (segment_command *)linkedit_lc->raw_lc;
+		linkedit_offset = SWAP32(c->fileoff, magic);
+		linkedit_size = SWAP32(c->filesize, magic);
+	} else {
+		auto *c = (segment_command_64 *)linkedit_lc->raw_lc;
+		linkedit_offset = SWAP64(c->fileoff, magic);
+		linkedit_size = SWAP64(c->filesize, magic);
+	}
+
+	if(linkedit_offset + linkedit_size != arch.fat_arch.size) {
+		return false;
+	}
+
+	uint32_t size_reduction = codesig_size;
+
+	if(symtab_lc) {
+		auto *symtab_cmd = (symtab_command *)symtab_lc->raw_lc;
+
+		uint32_t strsize = SWAP32(symtab_cmd->strsize, magic);
+		int64_t diff_size = ((int64_t)arch.fat_arch.size - size_reduction) - (SWAP32(symtab_cmd->stroff, magic) + strsize);
+
+		if(0x0 <= diff_size && diff_size <= 0x10) {
+			size_reduction += diff_size;
+		}
+	}
+
+	arch.fat_arch.size -= size_reduction;
+	linkedit_size -= size_reduction;
+	uint64_t linkedit_vmsize = ROUND_UP(linkedit_size, 0x1000);
+
+	if(linkedit_lc->cmd == LC_SEGMENT) {
+		auto *c = (segment_command *)linkedit_lc->raw_lc;
+		c->filesize = SWAP32(linkedit_size, magic);
+		c->vmsize = SWAP32(linkedit_vmsize, magic);
+	} else {
+		auto *c = (segment_command_64 *)linkedit_lc->raw_lc;
+		c->filesize = SWAP64(linkedit_size, magic);
+		c->vmsize = SWAP64(linkedit_vmsize, magic);
+	}
+
+	write_fat_archs();
+
+	write_load_command(*linkedit_lc);
+
+	remove_load_command(arch_index, codesig_index);
+
+	return true;
 }

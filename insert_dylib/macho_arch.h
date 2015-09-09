@@ -22,4 +22,6 @@ public:
 
 	std::string description() const;
 	void print_load_commands() const;
+
+	bool has_codesignature() const;
 };

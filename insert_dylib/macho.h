@@ -30,8 +30,9 @@ public:
 	void swap_arch(fat_arch *arch) const;
 
 	void write_fat_header() const;
-	void write_fat_archs() const;
+	void write_fat_archs();
 	void write_mach_header(MachOArch &arch) const;
+	void write_load_command(LoadCommand &lc) const;
 
 	void print_description() const;
 
@@ -47,4 +48,6 @@ public:
 	void remove_load_command(uint32_t arch_index, uint32_t lc_index);
 	void move_load_command(uint32_t arch_index, uint32_t lc_index, uint32_t new_index);
 	void insert_load_command(uint32_t arch_index, load_command *raw_lc);
+
+	bool remove_codesignature(uint32_t arch_index);
 };

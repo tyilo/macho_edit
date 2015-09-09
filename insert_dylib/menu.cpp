@@ -369,7 +369,7 @@ bool lc_config(MachO &macho) {
 
 	uint32_t arch = 0;
 	if(macho.n_archs > 1) {
-		arch = select_arch(macho, "Pick arch to edit:", o == 0);
+		arch = select_arch(macho, "Pick arch to edit:", o == 0 || o == 4);
 		if(arch == CANCEL) {
 			return false;
 		}
@@ -406,7 +406,12 @@ bool lc_config(MachO &macho) {
 		}
 		case 4: {
 			for(uint32_t i = first; i <= last; i++) {
-				//remove_codesig();
+				if(!macho.archs[i].has_codesignature()) {
+					std::cout << "Arch " << i << " doesn't have a codesignature.\n";
+					continue;
+				}
+				macho.remove_codesignature(i);
+				std::cout << "Removed codesignature from arch " << i << ".\n";
 			}
 
 			break;

@@ -53,3 +53,12 @@ void MachOArch::print_load_commands() const {
 		i++;
 	}
 }
+
+bool MachOArch::has_codesignature() const {
+	for(auto &lc : load_commands) {
+		if(lc.cmd == LC_CODE_SIGNATURE) {
+			return true;
+		}
+	}
+	return false;
+}
