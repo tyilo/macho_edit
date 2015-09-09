@@ -12,8 +12,6 @@
 		551D1CAE1B89FB7C00179980 /* magicnames.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 551D1CAD1B89FB7C00179980 /* magicnames.cpp */; };
 		556AE7AC1B83C6D400414E32 /* cpuinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 556AE7AA1B83C6D400414E32 /* cpuinfo.cpp */; };
 		556AE7AF1B83E5C900414E32 /* menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 556AE7AD1B83E5C900414E32 /* menu.cpp */; };
-		55708CC21B308025002D62A8 /* insert_dylib_tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 55708CC11B308025002D62A8 /* insert_dylib_tests.m */; };
-		55708CCD1B308B77002D62A8 /* test.c.foo in Resources */ = {isa = PBXBuildFile; fileRef = 55708CCC1B308B77002D62A8 /* test.c.foo */; };
 		55ABCB4D19881CA600B03F31 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55ABCB4C19881CA600B03F31 /* main.cpp */; };
 		55EB1FC21B83AD7E009F1AD1 /* macho.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55EB1FC01B83AD7E009F1AD1 /* macho.cpp */; };
 		55F6925F1B7C2EAC007413F7 /* fileutils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 55F6925D1B7C2EAC007413F7 /* fileutils.cpp */; };
@@ -42,11 +40,7 @@
 		556AE7AB1B83C6D400414E32 /* cpuinfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpuinfo.h; sourceTree = "<group>"; };
 		556AE7AD1B83E5C900414E32 /* menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = menu.cpp; sourceTree = "<group>"; };
 		556AE7AE1B83E5C900414E32 /* menu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = menu.h; sourceTree = "<group>"; };
-		55708CBD1B308025002D62A8 /* insert_dylib_tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = insert_dylib_tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		55708CC01B308025002D62A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		55708CC11B308025002D62A8 /* insert_dylib_tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = insert_dylib_tests.m; sourceTree = "<group>"; };
-		55708CCC1B308B77002D62A8 /* test.c.foo */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.c.foo; sourceTree = "<group>"; };
-		55ABCB4919881CA600B03F31 /* insert_dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = insert_dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		55ABCB4919881CA600B03F31 /* macho_edit */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = macho_edit; sourceTree = BUILT_PRODUCTS_DIR; };
 		55ABCB4C19881CA600B03F31 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		55EB1FC01B83AD7E009F1AD1 /* macho.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = macho.cpp; sourceTree = "<group>"; };
 		55EB1FC11B83AD7E009F1AD1 /* macho.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = macho.h; sourceTree = "<group>"; };
@@ -56,13 +50,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		55708CBA1B308025002D62A8 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		55ABCB4619881CA600B03F31 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -73,29 +60,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		55708CBE1B308025002D62A8 /* insert_dylib_tests */ = {
-			isa = PBXGroup;
-			children = (
-				55708CC11B308025002D62A8 /* insert_dylib_tests.m */,
-				55708CBF1B308025002D62A8 /* Supporting Files */,
-			);
-			path = insert_dylib_tests;
-			sourceTree = "<group>";
-		};
-		55708CBF1B308025002D62A8 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				55708CCC1B308B77002D62A8 /* test.c.foo */,
-				55708CC01B308025002D62A8 /* Info.plist */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 		55ABCB4019881CA600B03F31 = {
 			isa = PBXGroup;
 			children = (
-				55ABCB4B19881CA600B03F31 /* insert_dylib */,
-				55708CBE1B308025002D62A8 /* insert_dylib_tests */,
+				55ABCB4B19881CA600B03F31 /* macho_edit */,
 				55ABCB4A19881CA600B03F31 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -103,13 +71,12 @@
 		55ABCB4A19881CA600B03F31 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				55ABCB4919881CA600B03F31 /* insert_dylib */,
-				55708CBD1B308025002D62A8 /* insert_dylib_tests.xctest */,
+				55ABCB4919881CA600B03F31 /* macho_edit */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		55ABCB4B19881CA600B03F31 /* insert_dylib */ = {
+		55ABCB4B19881CA600B03F31 /* macho_edit */ = {
 			isa = PBXGroup;
 			children = (
 				55F6925C1B7C2E86007413F7 /* macros.h */,
@@ -129,32 +96,15 @@
 				556AE7AD1B83E5C900414E32 /* menu.cpp */,
 				55ABCB4C19881CA600B03F31 /* main.cpp */,
 			);
-			path = insert_dylib;
+			path = macho_edit;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		55708CBC1B308025002D62A8 /* insert_dylib_tests */ = {
+		55ABCB4819881CA600B03F31 /* macho_edit */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 55708CC51B308025002D62A8 /* Build configuration list for PBXNativeTarget "insert_dylib_tests" */;
-			buildPhases = (
-				55708CB91B308025002D62A8 /* Sources */,
-				55708CBA1B308025002D62A8 /* Frameworks */,
-				55708CBB1B308025002D62A8 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = insert_dylib_tests;
-			productName = insert_dylib_tests;
-			productReference = 55708CBD1B308025002D62A8 /* insert_dylib_tests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		55ABCB4819881CA600B03F31 /* insert_dylib */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 55ABCB5219881CA600B03F31 /* Build configuration list for PBXNativeTarget "insert_dylib" */;
+			buildConfigurationList = 55ABCB5219881CA600B03F31 /* Build configuration list for PBXNativeTarget "macho_edit" */;
 			buildPhases = (
 				55ABCB4519881CA600B03F31 /* Sources */,
 				55ABCB4619881CA600B03F31 /* Frameworks */,
@@ -164,9 +114,9 @@
 			);
 			dependencies = (
 			);
-			name = insert_dylib;
-			productName = insert_dylib;
-			productReference = 55ABCB4919881CA600B03F31 /* insert_dylib */;
+			name = macho_edit;
+			productName = macho_edit;
+			productReference = 55ABCB4919881CA600B03F31 /* macho_edit */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -177,13 +127,8 @@
 			attributes = {
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = Tyilo;
-				TargetAttributes = {
-					55708CBC1B308025002D62A8 = {
-						CreatedOnToolsVersion = 6.3.2;
-					};
-				};
 			};
-			buildConfigurationList = 55ABCB4419881CA600B03F31 /* Build configuration list for PBXProject "insert_dylib" */;
+			buildConfigurationList = 55ABCB4419881CA600B03F31 /* Build configuration list for PBXProject "macho_edit" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -195,32 +140,12 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				55ABCB4819881CA600B03F31 /* insert_dylib */,
-				55708CBC1B308025002D62A8 /* insert_dylib_tests */,
+				55ABCB4819881CA600B03F31 /* macho_edit */,
 			);
 		};
 /* End PBXProject section */
 
-/* Begin PBXResourcesBuildPhase section */
-		55708CBB1B308025002D62A8 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				55708CCD1B308B77002D62A8 /* test.c.foo in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
-		55708CB91B308025002D62A8 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				55708CC21B308025002D62A8 /* insert_dylib_tests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		55ABCB4519881CA600B03F31 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -239,50 +164,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		55708CC31B308025002D62A8 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"$(inherited)",
-				);
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = insert_dylib_tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		55708CC41B308025002D62A8 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"$(inherited)",
-				);
-				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = insert_dylib_tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 		55ABCB5019881CA600B03F31 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -370,16 +251,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		55708CC51B308025002D62A8 /* Build configuration list for PBXNativeTarget "insert_dylib_tests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				55708CC31B308025002D62A8 /* Debug */,
-				55708CC41B308025002D62A8 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		55ABCB4419881CA600B03F31 /* Build configuration list for PBXProject "insert_dylib" */ = {
+		55ABCB4419881CA600B03F31 /* Build configuration list for PBXProject "macho_edit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				55ABCB5019881CA600B03F31 /* Debug */,
@@ -388,7 +260,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		55ABCB5219881CA600B03F31 /* Build configuration list for PBXNativeTarget "insert_dylib" */ = {
+		55ABCB5219881CA600B03F31 /* Build configuration list for PBXNativeTarget "macho_edit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				55ABCB5319881CA600B03F31 /* Debug */,
