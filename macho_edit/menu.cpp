@@ -283,7 +283,7 @@ load_command *get_path_cmd(const char *prompt, size_t header_size, uint32_t *cmd
 	uint32_t path_size = (uint32_t)ROUND_UP(path.length() + 1, PATH_PADDING);
 	*cmdsize = (uint32_t)header_size + path_size;
 
-	load_command *lc = (load_command *)malloc(*cmdsize);
+	load_command *lc = (load_command *)calloc(*cmdsize, sizeof(char));
 	memcpy(((uint8_t *)lc) + header_size, path.c_str(), path.length());
 	return lc;
 }
