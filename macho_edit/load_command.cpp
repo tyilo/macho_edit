@@ -155,6 +155,24 @@ std::string LoadCommand::description() const {
 
 			break;
 		}
+#ifdef LC_BUILD_VERSION
+        case LC_VERSION_MIN_TVOS:
+        case LC_VERSION_MIN_WATCHOS: {
+            auto *c = (version_min_command *)raw_lc;
+            o << ": " << c->version << "-" << c->sdk;
+            break;
+        }
+        case LC_NOTE: {
+            auto *c = (note_command *)raw_lc;
+            o << ": " << std::string(c->data_owner, ELEMENTS(c->data_owner));
+            break;
+        }
+        case LC_BUILD_VERSION: {
+            auto *c = (build_version_command *)raw_lc;
+            o << ": " << c->platform << "-" << c->minos << "-" << c->sdk << "-" << c->ntools;
+            break;
+        }
+#endif
 	}
 	
 	return o.str();
