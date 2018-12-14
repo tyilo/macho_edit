@@ -73,6 +73,12 @@ std::string cmd_name(uint32_t cmd) {
 			RET_NAME(LC_ENCRYPTION_INFO_64);
 			RET_NAME(LC_LINKER_OPTION);
 			RET_NAME(LC_LINKER_OPTIMIZATION_HINT);
+#ifdef LC_BUILD_VERSION
+            RET_NAME(LC_VERSION_MIN_TVOS);
+            RET_NAME(LC_VERSION_MIN_WATCHOS);
+            RET_NAME(LC_NOTE);
+            RET_NAME(LC_BUILD_VERSION);
+#endif
 	}
 
 	std::ostringstream o;
